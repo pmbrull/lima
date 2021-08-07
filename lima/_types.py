@@ -1,3 +1,6 @@
+"""
+Define pydantic types to use for levy config
+"""
 from typing import List
 
 from pydantic import BaseModel
