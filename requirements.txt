@@ -1,0 +1,4 @@
+docker==5.0.0
+kubernetes==17.17.0
+Jinja2==3.0.1
+levy
