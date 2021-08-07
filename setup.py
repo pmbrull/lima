@@ -10,7 +10,9 @@ setup(
     description="Custom python interpreter",
     license="MIT",
     packages=["lima"],
-    entry_points={"console_scripts": ["pylima=lima.shell:init"]},
+    entry_points={"console_scripts": ["pylima=lima.shell:main"]},
     install_requires=requirements,
     zip_safe=False,
+    package_data={"lima": ["*.yaml"]},
+    include_package_data=True,
 )
