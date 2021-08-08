@@ -1,6 +1,7 @@
 """
 Main module to configure and run lima
 """
+import builtins
 import os
 from typing import Optional
 
@@ -11,6 +12,7 @@ from levy.config import Config
 
 from lima._types import PromptCfg
 from lima.evaluator import Evaluator
+from lima.bindings import bindings
 
 
 class Prompt(PromptSession):
@@ -32,17 +34,28 @@ class Prompt(PromptSession):
 
         self.cfg = Config.read_file(cfg_file, datatype=PromptCfg)
 
+        kwargs.setdefault("multiline", True)
+        kwargs.setdefault("key_bindings", bindings)
+
         super().__init__(*args, **kwargs)
 
 
 def main():
 
     session = Prompt(lexer=PygmentsLexer(PythonLexer))
-    evaluator = Evaluator(_globals={}, _locals={})
+
+    globals = {
+        "__name__": "__main__",
+        "__package__": None,
+        "__doc__": None,
+        "__builtins__": builtins,
+    }
+
+    evaluator = Evaluator(_globals=globals, _locals=globals)
 
     while True:
         try:
-            text = session.prompt("> ")
+            text = session.prompt("lima> ")
             if text in session.cfg.end_text:
                 break
 
