@@ -1,7 +1,7 @@
 """
 Multiline helpers.
 
-Ported from ptpython.utils
+Ported from ptpython.utils and changed and simplified pieces of logic.
 """
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.application.current import get_app

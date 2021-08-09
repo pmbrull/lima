@@ -2,6 +2,9 @@
 Class holding the evaluation logic
 """
 import ast
+import subprocess
+
+from typing import Optional
 
 
 class Evaluator:
@@ -11,9 +14,22 @@ class Evaluator:
         self._globals = _globals
         self._locals = _locals
 
-    def eval(self, stmt: str):
+    def eval(self, text: str) -> Optional[str]:
         """
-        Smart evaluation of prompt statements.
+        Evaluator of the statements that we can get as inputs
+        :param text:
+        """
+        if text.startswith("%"):
+            return self.magic_eval(text.lstrip("%"))
+
+        if text.startswith("!"):
+            return self.cmd_eval(text.lstrip("!"))
+
+        return self.py_eval(text)
+
+    def py_eval(self, statement: str) -> str:
+        """
+        Smart evaluation of python prompt statements.
 
         If the statement is an expression, we will `eval` and return the result.
         Otherwise, we will `exec` the statement.
@@ -24,7 +40,7 @@ class Evaluator:
         At some point, we might add AST transformer to add glitter
         to the parsed code.
         """
-        parsed = ast.parse(stmt)
+        parsed = ast.parse(statement)
 
         expr = None
         res = None
@@ -40,3 +56,11 @@ class Evaluator:
             res = eval(code, self._globals, self._locals)
 
         return res
+
+    def magic_eval(self, statement: str):
+        pass
+
+    @staticmethod
+    def cmd_eval(statement: str) -> None:
+        subprocess.run(statement.split(" "))
+        return None
