@@ -30,9 +30,6 @@ def multiline_enter(event):
     text_after_cursor = document.text_after_cursor
     text_before_cursor = document.text_before_cursor
 
-    # print(f"TEXT AFTER CURSOR: \"{repr(text_after_cursor)}\"")
-    # print(f"TEXT BEFORE CURSOR: \"{repr(text_before_cursor)}\"")
-
     if (
         not text_after_cursor or text_after_cursor.isspace()
     ) and text_before_cursor.replace(" ", "").endswith("\n"):
@@ -40,7 +37,7 @@ def multiline_enter(event):
         accept_line(event)
 
     elif not multiline_doc:
-        # Always accept a single valid line
+        # Always accept a single line
         accept_line(event)
     else:
         auto_newline(event.current_buffer)

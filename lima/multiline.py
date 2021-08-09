@@ -10,7 +10,7 @@ import re
 
 
 UNINDENT_KW = ["pass", "continue", "break", "return", "raise"]
-_multiline_string_delims = re.compile("""[']{3}|["]{3}""")
+_multiline_string_delims = re.compile("[']{3}|[\"]{3}")
 
 
 def has_unclosed_brackets(text: str) -> bool:
@@ -42,18 +42,21 @@ def has_unclosed_brackets(text: str) -> bool:
     return False
 
 
-def ends_in_multiline_string(document) -> bool:
+def has_multiline_string(document) -> bool:
     """
-    ``True`` if we're inside a multiline string at the end of the text.
+    True if we have a multiline string that needs to be closed.
+    We can check if we need to close if the length of the
+    found delimiters for a specific char (" | ') is odd.
+
+    E.g., we have: '''random.
     """
-    delims = _multiline_string_delims.findall(document.text)
-    opening = None
-    for delim in delims:
-        if opening is None:
-            opening = delim
-        elif delim == opening:
-            opening = None
-    return bool(opening)
+
+    delimiters = _multiline_string_delims.findall(document.text)
+
+    return bool(
+        len([d for d in delimiters if d == '"' * 3]) % 2
+        | len([d for d in delimiters if d == "'" * 3]) % 2
+    )
 
 
 def document_is_multiline_python(document) -> bool:
@@ -64,7 +67,7 @@ def document_is_multiline_python(document) -> bool:
     if (
         "\n" in document.text  # We have a line jump
         or document.text_before_cursor[-1:] == "\\"  # New line char
-        or ends_in_multiline_string(document)
+        or has_multiline_string(document)
     ):
         return True
 
@@ -101,20 +104,17 @@ def auto_newline(buffer):
         # Unident if the last line ends with one of these keywords
         for keyword in UNINDENT_KW:
             begin = current_line.lstrip()
+            # e.g., "pass", "return smt"...
             if begin.startswith(keyword + " ") or begin == keyword:
                 unindent = True
                 break
         else:
             unindent = False
-
-        # Copy whitespace from current line
-        current_line2 = current_line[4:] if unindent else current_line
-
-        for c in current_line2:
-            if c.isspace():
-                insert_text(c)
-            else:
-                break
+        #
+        # Insert the current whitespaces minus 4 if we need to unindent
+        current_indent_level = len(current_line) - len(current_line.lstrip())
+        next_indent = current_indent_level - 4 if unindent else current_indent_level
+        insert_text(" " * next_indent)
 
         # If the last line ends with a colon, add four extra spaces.
         if current_line[-1:] == ":":
