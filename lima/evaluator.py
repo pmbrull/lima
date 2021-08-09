@@ -6,6 +6,8 @@ import subprocess
 
 from typing import Optional
 
+from lima.magic import magic_registry, InvalidMagicException
+
 
 class Evaluator:
     def __init__(self, *, _globals, _locals):
@@ -57,10 +59,20 @@ class Evaluator:
 
         return res
 
-    def magic_eval(self, statement: str):
-        pass
+    def magic_eval(self, statement: str) -> Optional[str]:
+        magic, *rest = statement.split(" ")
+
+        try:
+            magic_fn = magic_registry.registry[magic]
+        except KeyError:
+            raise InvalidMagicException(f"'{magic}' is not a registered magic command")
+
+        return self.py_eval(magic_fn(rest))
 
     @staticmethod
     def cmd_eval(statement: str) -> None:
+        """
+        Run any statement being passed to the Evaluator
+        """
         subprocess.run(statement.split(" "))
         return None

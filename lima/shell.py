@@ -5,7 +5,7 @@ import builtins
 import os
 from typing import Optional
 
-from prompt_toolkit import PromptSession
+from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers.python import PythonLexer
 from levy.config import Config
@@ -44,14 +44,14 @@ def main():
 
     session = Prompt(lexer=PygmentsLexer(PythonLexer))
 
-    globals = {
+    _globals = {
         "__name__": "__main__",
         "__package__": None,
         "__doc__": None,
         "__builtins__": builtins,
     }
 
-    evaluator = Evaluator(_globals=globals, _locals=globals)
+    evaluator = Evaluator(_globals=_globals, _locals=_globals)
 
     while True:
         try:
@@ -64,11 +64,14 @@ def main():
         except EOFError:
             break
         else:
-            res = evaluator.eval(text)
-            if res:
-                print(res)
+            try:
+                res = evaluator.eval(text)
+                if res:
+                    print_formatted_text(res)
+            except Exception as e:
+                print_formatted_text(f"{e.__class__.__name__}: {e}")
 
-    print("Bye!")
+    print_formatted_text("Bye!")
 
 
 if __name__ == "__main__":
