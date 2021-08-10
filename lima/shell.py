@@ -34,10 +34,29 @@ class Prompt(PromptSession):
 
         self.cfg = Config.read_file(cfg_file, datatype=PromptCfg)
 
+        self.prompt_num = 1
+
         kwargs.setdefault("multiline", True)
         kwargs.setdefault("key_bindings", bindings)
 
         super().__init__(*args, **kwargs)
+
+    def print(self, res: str):
+        """
+        Print result and increase prompt number
+        """
+
+        print_formatted_text(f"Out [{self.prompt_num}]: {res}\n")
+        self.prompt_num += 1
+
+    def print_exc(self, exc: Exception):
+        """
+        Print exception and increase prompt number
+        """
+        print_formatted_text(
+            f"Out [{self.prompt_num}]: {exc.__class__.__name__}: {exc}\n"
+        )
+        self.prompt_num += 1
 
 
 def main():
@@ -55,7 +74,8 @@ def main():
 
     while True:
         try:
-            text = session.prompt("lima> ")
+            text = session.prompt(f"In  [{session.prompt_num}]: ")
+
             if text in session.cfg.end_text:
                 break
 
@@ -65,11 +85,11 @@ def main():
             break
         else:
             try:
-                res = evaluator.eval(text)
-                if res:
-                    print_formatted_text(res)
+                if res := evaluator.eval(text):
+                    session.print(res)
+
             except Exception as e:
-                print_formatted_text(f"{e.__class__.__name__}: {e}")
+                session.print_exc(e)
 
     print_formatted_text("Bye!")
 
