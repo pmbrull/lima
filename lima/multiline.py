@@ -13,7 +13,7 @@ UNINDENT_KW = ["pass", "continue", "break", "return", "raise"]
 _multiline_string_delims = re.compile("[']{3}|[\"]{3}")
 
 
-def has_unclosed_brackets(text: str) -> bool:
+def unclosed_brackets(text: str) -> bool:
     """
     Starting at the end of the string. If we find an opening bracket
     for which we didn't had a closing one yet, return True.
@@ -42,7 +42,7 @@ def has_unclosed_brackets(text: str) -> bool:
     return False
 
 
-def has_multiline_string(document) -> bool:
+def unclosed_multiline_string(text: str) -> bool:
     """
     True if we have a multiline string that needs to be closed.
     We can check if we need to close if the length of the
@@ -51,7 +51,7 @@ def has_multiline_string(document) -> bool:
     E.g., we have: '''random.
     """
 
-    delimiters = _multiline_string_delims.findall(document.text)
+    delimiters = _multiline_string_delims.findall(text)
 
     return bool(
         len([d for d in delimiters if d == '"' * 3]) % 2
@@ -67,7 +67,7 @@ def document_is_multiline_python(document) -> bool:
     if (
         "\n" in document.text  # We have a line jump
         or document.text_before_cursor[-1:] == "\\"  # New line char
-        or has_multiline_string(document)
+        or unclosed_multiline_string(document.text)
     ):
         return True
 
@@ -75,7 +75,7 @@ def document_is_multiline_python(document) -> bool:
         document.current_line.rstrip()[-1:] == ":"
         or (
             document.is_cursor_at_the_end
-            and has_unclosed_brackets(document.text_before_cursor)
+            and unclosed_brackets(document.text_before_cursor)
         )
         or document.text.startswith("@")  # Decorator
     ):
@@ -117,7 +117,7 @@ def auto_newline(buffer):
         insert_text(" " * next_indent)
 
         # If the last line ends with a colon, add four extra spaces.
-        if current_line[-1:] == ":":
+        if current_line[-1] == ":":
             insert_text(" " * 4)
 
 

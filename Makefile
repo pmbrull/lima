@@ -30,5 +30,5 @@ black_check:
 
 unit:
 	coverage erase
-	coverage run -m pytest --doctest-modules --junitxml=junit/test-results.xml $(TEST_DIR)
+	coverage run -m pytest -s --doctest-modules --junitxml=junit/test-results.xml $(TEST_DIR)
 	coverage xml -i
