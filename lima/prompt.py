@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 
-from prompt_toolkit import PromptSession, print_formatted_text
+from prompt_toolkit import PromptSession, print_formatted_text, HTML
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.styles import Style
@@ -72,3 +72,10 @@ class Prompt(PromptSession):
             f"Out [{self.prompt_num}]: {exc.__class__.__name__}: {exc}\n"
         )
         self.prompt_num += 1
+
+    @staticmethod
+    def bye():
+        """
+        Print Bye message
+        """
+        print_formatted_text(HTML("<skyblue><b>Bye!</b></skyblue>"))

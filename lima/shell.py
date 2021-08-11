@@ -3,8 +3,6 @@ Main module to configure and run lima
 """
 import builtins
 
-from prompt_toolkit import print_formatted_text
-
 from lima.evaluator import Evaluator
 from lima.prompt import Prompt
 
@@ -41,7 +39,7 @@ def main():
             except Exception as e:
                 session.print_exc(e)
 
-    print_formatted_text("Bye!")
+    session.bye()
 
 
 if __name__ == "__main__":
