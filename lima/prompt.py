@@ -5,6 +5,7 @@ from prompt_toolkit import PromptSession, print_formatted_text, HTML
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers.python import PythonLexer
 from prompt_toolkit.styles import Style
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from levy.config import Config
 
 from lima._types import PromptCfg
@@ -53,7 +54,11 @@ class Prompt(PromptSession):
         Display the input line
         """
 
-        return self.prompt(f"[{self.prompt_num}]: ")
+        return self.prompt(
+            f"[{self.prompt_num}]: ",
+            complete_while_typing=True,
+            auto_suggest=AutoSuggestFromHistory(),
+        )
 
     def print(self, res: str) -> None:
         """
