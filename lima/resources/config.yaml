@@ -1,3 +1,19 @@
 end_text:
   - bye
   - quit()
+
+style:
+  pygments_keyword: "underline #e066ff"
+  pygments_literal_string: "#85BC6B"
+
+  pygments_name_function: "#00bfff"
+  pygments_name_class: "#ffd700"
+  pygments_name_exception: "#ffd700"
+  pygments_name_decorator: "#ffd700"
+  pygments_name_builtin: "#54ff9f"
+  pygments_name_variable: "#54ff9f"
+
+  pygments_punctuation: "#00ff7f"
+
+  pygments_literal_number: "#00ffff"
+  pygments_operator: "#00ffff"
