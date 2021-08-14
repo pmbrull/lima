@@ -17,3 +17,5 @@ style:
 
   pygments_literal_number: "#00ffff"
   pygments_operator: "#00ffff"
+
+  pygments_name_namespace: "#00ffff"
