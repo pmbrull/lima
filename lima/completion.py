@@ -1,13 +1,44 @@
+"""
+Taken from ptpython.completer and ptpython.util
+
+Copyright (c) 2015, Jonathan Slenders
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, this
+  list of conditions and the following disclaimer in the documentation and/or
+  other materials provided with the distribution.
+* Neither the name of the {organization} nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
 from typing import Iterable
 
-from prompt_toolkit.completion import CompleteEvent, Completer, Completion
+from prompt_toolkit.completion import (
+    CompleteEvent,
+    Completer,
+    Completion,
+    FuzzyCompleter,
+)
 from prompt_toolkit.document import Document
 
 
 def get_jedi_script_from_document(document, _locals, _globals):
     import jedi  # We keep this import in-line, to improve start-up time.
-
-    # Importing Jedi is 'slow'.
 
     try:
         return jedi.Interpreter(
@@ -48,14 +79,17 @@ class LimaCompleter(Completer):
         self._globals = _globals
         self._locals = _locals
 
-        self._jedi_completer = JediCompleter(self._globals, self._locals)
+        self._jedi_completer = FuzzyCompleter(
+            completer=JediCompleter(self._globals, self._locals), enable_fuzzy=True
+        )
 
-    def _complete_python_while_typing(self, document: Document) -> bool:
+    @staticmethod
+    def _complete_python_while_typing(document: Document) -> bool:
         """
         When `complete_while_typing` is set, only return completions when this
         returns `True`.
         """
-        text = document.text_before_cursor  # .rstrip()
+        text = document.text_before_cursor
         char_before_cursor = text[-1:]
         return bool(
             text and (char_before_cursor.isalnum() or char_before_cursor in "_.([,")
@@ -77,7 +111,7 @@ class LimaCompleter(Completer):
 
 class JediCompleter(Completer):
     """
-    Autocompleter that uses the Jedi library.
+    Autocomplete with Jedi: https://github.com/davidhalter/jedi
     """
 
     def __init__(self, _globals, _locals) -> None:
@@ -161,5 +195,4 @@ class JediCompleter(Completer):
                         len(jc.complete) - len(jc.name_with_symbols),
                         display=jc.name_with_symbols + suffix,
                         display_meta=jc.type,
-                        # style=_get_style_for_jedi_completion(jc),
                     )
