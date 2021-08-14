@@ -9,8 +9,6 @@ from lima.prompt import Prompt
 
 def main():
 
-    session = Prompt()
-
     _globals = {
         "__name__": "__main__",
         "__package__": None,
@@ -18,7 +16,7 @@ def main():
         "__builtins__": builtins,
     }
 
-    evaluator = Evaluator(_globals=_globals, _locals=_globals)
+    session = Prompt(evaluator=Evaluator(_globals=_globals, _locals=_globals))
 
     while True:
         try:
@@ -33,7 +31,7 @@ def main():
             break
         else:
             try:
-                if res := evaluator.eval(text):
+                if res := session.evaluator.eval(text):
                     session.print(res)
 
             except Exception as e:

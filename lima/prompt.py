@@ -1,16 +1,18 @@
 import os
 from typing import Optional
 
-from prompt_toolkit import PromptSession, print_formatted_text, HTML
-from prompt_toolkit.lexers import PygmentsLexer
-from pygments.lexers.python import PythonLexer
-from prompt_toolkit.styles import Style
+from levy.config import Config
+from prompt_toolkit import HTML, PromptSession, print_formatted_text
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import FileHistory
-from levy.config import Config
+from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.styles import Style
+from pygments.lexers.python import PythonLexer
 
 from lima._types import PromptCfg
 from lima.bindings import bindings
+from lima.completion import LimaCompleter
+from lima.evaluator import Evaluator
 
 
 class Prompt(PromptSession):
@@ -21,6 +23,7 @@ class Prompt(PromptSession):
     def __init__(
         self,
         *args,
+        evaluator: Evaluator,
         cfg_file: Optional[str] = None,
         history_file: Optional[str] = None,
         **kwargs,
@@ -38,6 +41,7 @@ class Prompt(PromptSession):
 
         self.cfg = Config.read_file(cfg_file, datatype=PromptCfg)
 
+        self.evaluator = evaluator
         self.prompt_num = 1
 
         kwargs.setdefault("multiline", True)
@@ -45,6 +49,14 @@ class Prompt(PromptSession):
         kwargs.setdefault("lexer", PygmentsLexer(PythonLexer))
         kwargs.setdefault("style", self.parse_style())
         kwargs.setdefault("history", self.set_history(history_file))
+        kwargs.setdefault(
+            "completer",
+            LimaCompleter(
+                _globals=self.evaluator._globals,
+                _locals=self.evaluator._locals,
+            ),
+        )
+        kwargs.setdefault("complete_in_thread", True)
 
         super().__init__(*args, **kwargs)
 
