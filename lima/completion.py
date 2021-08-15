@@ -38,7 +38,11 @@ from prompt_toolkit.document import Document
 
 
 def get_jedi_script_from_document(document, _locals, _globals):
-    import jedi  # We keep this import in-line, to improve start-up time.
+    """
+    Given a document and namespaces, return the completion script
+    """
+    # We keep this import in-line, to improve start-up time.
+    import jedi  # pylint: disable=import-outside-toplevel
 
     try:
         return jedi.Interpreter(
@@ -59,7 +63,7 @@ def get_jedi_script_from_document(document, _locals, _globals):
     except KeyError:
         # Workaroud for a crash when the input is "u'", the start of a unicode string.
         return None
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         # Workaround for: https://github.com/jonathanslenders/ptpython/issues/91
         return None
 
@@ -123,6 +127,7 @@ class JediCompleter(Completer):
     def get_completions(
         self, document: Document, complete_event: CompleteEvent
     ) -> Iterable[Completion]:
+        # pylint: disable=too-many-branches
         script = get_jedi_script_from_document(document, self._locals, self._globals)
 
         if script:
@@ -164,7 +169,7 @@ class JediCompleter(Completer):
             except NotImplementedError:
                 # See: https://github.com/jonathanslenders/ptpython/issues/223
                 pass
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 # Supress all other Jedi exceptions.
                 pass
             else:

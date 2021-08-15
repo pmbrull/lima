@@ -8,6 +8,9 @@ from lima.prompt import Prompt
 
 
 def main():
+    """
+    Create the prompt session to run the shell
+    """
 
     _globals = {
         "__name__": "__main__",
@@ -34,7 +37,7 @@ def main():
                 if res := session.evaluator.eval(text):
                     session.print(res)
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 session.print_exc(e)
 
     session.bye()

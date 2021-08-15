@@ -1,3 +1,6 @@
+"""
+Module defining custom Prompt
+"""
 import os
 from typing import Optional
 
@@ -97,6 +100,7 @@ class Prompt(PromptSession):
         color = self.cfg.prompt.dots
 
         def continuation(width, line_number, is_soft_wrap):
+            # pylint: disable=unused-argument
             dots = " " + "." * (width - 2)
             return HTML(f"<{color}>{dots}</{color}>")
 

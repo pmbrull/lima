@@ -3,13 +3,16 @@ Class holding the evaluation logic
 """
 import ast
 import subprocess
-
 from typing import Optional
 
-from lima.magic import magic_registry, InvalidMagicException
+from lima.magic import InvalidMagicException, magic_registry
 
 
 class Evaluator:
+    """
+    Contains methods to evaluate python code, commands and magic
+    """
+
     def __init__(self, *, _globals, _locals):
 
         self.file = "<stdin>"
@@ -51,11 +54,11 @@ class Evaluator:
             expr = parsed.body.pop()
 
         code = compile(parsed, self.file, "exec")
-        exec(code, self._globals, self._locals)
+        exec(code, self._globals, self._locals)  # pylint: disable=exec-used
 
         if expr:
             code = compile(ast.Expression(expr.value), self.file, "eval")
-            res = eval(code, self._globals, self._locals)
+            res = eval(code, self._globals, self._locals)  # pylint: disable=eval-used
 
         return res
 
@@ -73,6 +76,7 @@ class Evaluator:
     def cmd_eval(statement: str) -> None:
         """
         Run any statement being passed to the Evaluator
+
+        Don't raise an exception with non-zero exits
         """
-        subprocess.run(statement.split(" "))
-        return None
+        subprocess.run(statement.split(" "), check=False)

@@ -17,6 +17,7 @@ def unclosed_brackets(text: str) -> bool:
     Starting at the end of the string. If we find an opening bracket
     for which we didn't had a closing one yet, return True.
     """
+    # pylint: disable=too-many-boolean-expressions
     stack = []
 
     # Ignore braces inside strings
@@ -27,13 +28,12 @@ def unclosed_brackets(text: str) -> bool:
             stack.append(char)
 
         elif char in "[({":
-            if stack:
-                if (
-                    (char == "[" and stack[-1] == "]")
-                    or (char == "{" and stack[-1] == "}")
-                    or (char == "(" and stack[-1] == ")")
-                ):
-                    stack.pop()
+            if stack and (
+                (char == "[" and stack[-1] == "]")
+                or (char == "{" and stack[-1] == "}")
+                or (char == "(" and stack[-1] == ")")
+            ):
+                stack.pop()
             else:
                 # Opening bracket for which we didn't had a closing one.
                 return True
