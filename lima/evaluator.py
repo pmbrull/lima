@@ -30,6 +30,9 @@ class Evaluator:
         if text.startswith("!"):
             return self.cmd_eval(text.lstrip("!"))
 
+        if text.startswith("?"):
+            return self.help_eval(text.lstrip("?"))
+
         return self.py_eval(text)
 
     def py_eval(self, statement: str) -> str:
@@ -71,6 +74,9 @@ class Evaluator:
             raise InvalidMagicException(f"'{magic}' is not a registered magic command")
 
         return self.py_eval(magic_fn(rest))
+
+    def help_eval(self, name: str) -> Optional[str]:
+        return self.py_eval(f"help({name})")
 
     @staticmethod
     def cmd_eval(statement: str) -> None:
