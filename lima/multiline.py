@@ -3,11 +3,10 @@ Multiline helpers.
 
 Ported from ptpython.utils and changed and simplified pieces of logic.
 """
-from prompt_toolkit.filters import Condition
-from prompt_toolkit.application.current import get_app
-
 import re
 
+from prompt_toolkit.application.current import get_app
+from prompt_toolkit.filters import Condition
 
 UNINDENT_KW = ["pass", "continue", "break", "return", "raise"]
 _multiline_string_delims = re.compile("[']{3}|[\"]{3}")
@@ -23,16 +22,16 @@ def unclosed_brackets(text: str) -> bool:
     # Ignore braces inside strings
     text = re.sub(r"""('[^']*'|"[^"]*")""", "", text)
 
-    for c in reversed(text):
-        if c in "])}":
-            stack.append(c)
+    for char in reversed(text):
+        if char in "])}":
+            stack.append(char)
 
-        elif c in "[({":
+        elif char in "[({":
             if stack:
                 if (
-                    (c == "[" and stack[-1] == "]")
-                    or (c == "{" and stack[-1] == "}")
-                    or (c == "(" and stack[-1] == ")")
+                    (char == "[" and stack[-1] == "]")
+                    or (char == "{" and stack[-1] == "}")
+                    or (char == "(" and stack[-1] == ")")
                 ):
                     stack.pop()
             else:
@@ -125,7 +124,7 @@ def auto_newline(buffer):
 def tab_should_insert_whitespace():
     app = get_app()
 
-    b = app.current_buffer
-    before_cursor = b.document.current_line_before_cursor
+    buffer = app.current_buffer
+    before_cursor = buffer.document.current_line_before_cursor
 
     return bool(not before_cursor or before_cursor.isspace())
