@@ -49,3 +49,32 @@ def timeit(statement: str) -> str:
     )
 
     return run
+
+
+@magic_registry.add()
+def whoami(_):
+    """
+    Return path, interpreter and git information
+    """
+    run = dedent(
+        """
+        # Check path
+        import os
+        from pathlib import Path
+        path = Path(os.getcwd())
+        where = os.path.join("~", path.parent.name, path.name)
+        # Check git
+        ref = None
+        if os.path.exists(".git"):
+            with open(".git/HEAD") as head:
+                ref = head.readline().split(' ')[-1].strip().replace("refs/heads/", "")
+        # Check Python version
+        import sys
+        version = sys.version.split(' ')[0]
+        from prompt_toolkit import HTML, PromptSession, print_formatted_text
+        res = f"{where} {'(' + ref + ')' if ref else ''} -V {version}"
+        print_formatted_text(HTML(f"<skyblue>{res}</skyblue>"))
+        """
+    )
+
+    return run

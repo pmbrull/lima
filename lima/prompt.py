@@ -129,6 +129,13 @@ class Prompt(PromptSession):
         )
         self.prompt_num += 1
 
+    def hello(self):
+        """
+        Greet and use %whoami magic to print info at startup
+        """
+        print_formatted_text(HTML("<skyblue><b>>> Pylima</b></skyblue>"))
+        self.evaluator.magic_eval("whoami")
+
     @staticmethod
     def bye():
         """

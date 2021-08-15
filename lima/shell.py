@@ -20,6 +20,7 @@ def main():
     }
 
     session = Prompt(evaluator=Evaluator(_globals=_globals, _locals=_globals))
+    session.hello()
 
     while True:
         try:

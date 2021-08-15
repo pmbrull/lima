@@ -2,9 +2,8 @@ TEST_DIR ?= tests
 PROJECT_DIR ?= lima
 
 check:
-	@echo "Installing silently and running..."
 	@python setup.py install >/dev/null 2>&1;
-	pylima
+	@pylima
 
 install:
 	@echo "Installing requirements..."
