@@ -34,7 +34,8 @@ def main():
             break
         else:
             try:
-                if res := session.evaluator.eval(text):
+                res = session.evaluator.eval(text)
+                if res is not None:
                     session.print(res)
 
             except Exception as e:  # pylint: disable=broad-except
