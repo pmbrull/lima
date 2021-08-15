@@ -1,15 +1,13 @@
 """
 Module to add Key Bindings to the session
 """
+from prompt_toolkit.application.current import get_app
+from prompt_toolkit.filters import Condition
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.key_binding.bindings.named_commands import accept_line
 from prompt_toolkit.keys import Keys
 
-from prompt_toolkit.filters import Condition
-from prompt_toolkit.application.current import get_app
-from prompt_toolkit.key_binding.bindings.named_commands import accept_line
-
 from lima.multiline import auto_newline, document_is_multiline_python
-
 
 bindings = KeyBindings()
 
@@ -41,3 +39,57 @@ def multiline_enter(event):
         accept_line(event)
     else:
         auto_newline(event.current_buffer)
+
+
+@bindings.add("{")
+def brace_left(event):
+    event.current_buffer.insert_text("{")
+    event.current_buffer.insert_text("}", move_cursor=False)
+
+
+@bindings.add("(")
+def parent_left(event):
+    event.current_buffer.insert_text("(")
+    event.current_buffer.insert_text(")", move_cursor=False)
+
+
+@bindings.add("[")
+def bracket_left(event):
+    event.current_buffer.insert_text("[")
+    event.current_buffer.insert_text("]", move_cursor=False)
+
+
+@bindings.add('"')
+def quote_left(event):
+    """
+    Add another quote if there is no char after the cursor,
+    otherwise write it once.
+    """
+    buffer = event.current_buffer
+    document = buffer.document
+
+    text_after_cursor = document.text_after_cursor
+
+    if not text_after_cursor or text_after_cursor.isspace():
+        event.current_buffer.insert_text('"')
+        event.current_buffer.insert_text('"', move_cursor=False)
+    else:
+        event.current_buffer.insert_text('"')
+
+
+@bindings.add("'")
+def single_quote_left(event):
+    """
+    Add another single quote if there is no char after the cursor,
+    otherwise write it once.
+    """
+    buffer = event.current_buffer
+    document = buffer.document
+
+    text_after_cursor = document.text_after_cursor
+
+    if not text_after_cursor or text_after_cursor.isspace():
+        event.current_buffer.insert_text("'")
+        event.current_buffer.insert_text("'", move_cursor=False)
+    else:
+        event.current_buffer.insert_text("'")
