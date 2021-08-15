@@ -3,6 +3,7 @@ Magic functions registry
 """
 from collections import namedtuple
 from textwrap import dedent
+from typing import Optional
 
 
 class InvalidMagicException(Exception):
@@ -33,10 +34,13 @@ magic_registry = register()
 
 
 @magic_registry.add()
-def timeit(statement: str) -> str:
+def timeit(statement: str) -> Optional[str]:
     """
     Time the statement to run
     """
+    if not statement:
+        return "print('An statement is required')"
+
     run = dedent(
         f"""
         from time import perf_counter

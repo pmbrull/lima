@@ -33,8 +33,11 @@ from prompt_toolkit.completion import (
     Completer,
     Completion,
     FuzzyCompleter,
+    WordCompleter,
 )
 from prompt_toolkit.document import Document
+
+from lima.magic import magic_registry
 
 
 def get_jedi_script_from_document(document, _locals, _globals):
@@ -87,6 +90,8 @@ class LimaCompleter(Completer):
             completer=JediCompleter(self._globals, self._locals), enable_fuzzy=True
         )
 
+        self._magic_completer = MagicCompleter()
+
     @staticmethod
     def _complete_python_while_typing(document: Document) -> bool:
         """
@@ -105,12 +110,31 @@ class LimaCompleter(Completer):
         """
         Get Python completions.
         """
+        # If the input starts with %, use the magic completer
+        if document.text.lstrip().startswith("%"):
+            yield from self._magic_completer.get_completions(
+                Document(
+                    text=document.text[1:], cursor_position=document.cursor_position - 1
+                ),
+                complete_event,
+            )
+            return
 
-        # Do Jedi completions.
+        # Do Jedi completions
         if complete_event.completion_requested or self._complete_python_while_typing(
             document
         ):
             yield from self._jedi_completer.get_completions(document, complete_event)
+
+
+class MagicCompleter(WordCompleter):
+    """
+    Autocomplete with magic registry
+    """
+
+    def __init__(self):
+        words = list(magic_registry.registry.keys())
+        super().__init__(words=words)
 
 
 class JediCompleter(Completer):
