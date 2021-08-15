@@ -19,3 +19,6 @@ style:
   pygments_operator: "#00ffff"
 
   pygments_name_namespace: "#00ffff"
+
+prompt:
+  dots: "gray"

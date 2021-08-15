@@ -94,11 +94,17 @@ class Prompt(PromptSession):
         """
         Display the input line
         """
+        color = self.cfg.prompt.dots
+
+        def continuation(width, line_number, is_soft_wrap):
+            dots = " " + "." * (width - 2)
+            return HTML(f"<{color}>{dots}</{color}>")
 
         return self.prompt(
             f"[{self.prompt_num}]: ",
             complete_while_typing=True,
             auto_suggest=AutoSuggestFromHistory(),
+            prompt_continuation=continuation,
         )
 
     def print(self, res: str) -> None:
