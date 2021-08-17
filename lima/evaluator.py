@@ -66,6 +66,9 @@ class Evaluator:
         return res
 
     def magic_eval(self, statement: str) -> Optional[str]:
+        """
+        Use the magic_registry to pass the statement to the magic function
+        """
         magic, *rest = statement.split(" ")
 
         try:

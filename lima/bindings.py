@@ -41,25 +41,25 @@ def multiline_enter(event):
         auto_newline(event.current_buffer)
 
 
-@bindings.add("{")
+@bindings.add("{", filter=is_returnable)
 def brace_left(event):
     event.current_buffer.insert_text("{")
     event.current_buffer.insert_text("}", move_cursor=False)
 
 
-@bindings.add("(")
+@bindings.add("(", filter=is_returnable)
 def parent_left(event):
     event.current_buffer.insert_text("(")
     event.current_buffer.insert_text(")", move_cursor=False)
 
 
-@bindings.add("[")
+@bindings.add("[", filter=is_returnable)
 def bracket_left(event):
     event.current_buffer.insert_text("[")
     event.current_buffer.insert_text("]", move_cursor=False)
 
 
-@bindings.add('"')
+@bindings.add('"', filter=is_returnable)
 def quote_left(event):
     """
     Add another quote if there is no char after the cursor,
@@ -77,7 +77,7 @@ def quote_left(event):
         event.current_buffer.insert_text('"')
 
 
-@bindings.add("'")
+@bindings.add("'", filter=is_returnable)
 def single_quote_left(event):
     """
     Add another single quote if there is no char after the cursor,
