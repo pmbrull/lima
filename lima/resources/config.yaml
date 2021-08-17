@@ -20,5 +20,9 @@ style:
 
   pygments_name_namespace: "#00ffff"
 
+  bottom-toolbar: "noreverse"
+  bottom_toolbar_color: "skyblue"
+  bottom_toolbar_git_color: "ansigreen"
+
 prompt:
   dots: "gray"

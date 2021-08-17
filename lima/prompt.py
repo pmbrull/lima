@@ -2,6 +2,8 @@
 Module defining custom Prompt
 """
 import os
+import sys
+from pathlib import Path
 from typing import Optional
 
 from levy.config import Config
@@ -93,6 +95,31 @@ class Prompt(PromptSession):
 
         return FileHistory(history_file)
 
+    def prepare_toolbar(self):
+        """
+        Prepare HTML text to pass to the bottom toolbar.
+
+        It will display the current path, git info and executable.
+        """
+        path = Path(os.getcwd())
+        where = os.path.join("~", path.parent.name, path.name)
+        # Check git
+        ref = None
+        if os.path.exists(".git"):
+            with open(".git/HEAD") as head:
+                ref = head.readline().split(" ")[-1].strip().replace("refs/heads/", "")
+        # Check Python version
+        version = sys.version.split(" ")[0]
+
+        color = self.cfg.style("bottom_toolbar_color", "skyblue")
+        git_color = self.cfg.style("bottom_toolbar_git_color", "ansigreen")
+
+        color_where = f"<{color}>{where}</{color}>"
+        color_git = f"<{git_color}>({ref})</{git_color}>" if ref else ""
+        py_ver = f"<right>{sys.executable} -V {version}</right>"
+
+        return HTML(f"<b>{color_where} {color_git} {py_ver}</b>")
+
     def prompt_input(self):
         """
         Display the input line
@@ -104,11 +131,15 @@ class Prompt(PromptSession):
             dots = " " + "." * (width - 2)
             return HTML(f"<{color}>{dots}</{color}>")
 
+        def bottom_toolbar():
+            return self.prepare_toolbar()
+
         return self.prompt(
             f"[{self.prompt_num}]: ",
             complete_while_typing=True,
             auto_suggest=AutoSuggestFromHistory(),
             prompt_continuation=continuation,
+            bottom_toolbar=bottom_toolbar,
         )
 
     def print(self, res: str) -> None:
@@ -129,12 +160,12 @@ class Prompt(PromptSession):
         )
         self.prompt_num += 1
 
-    def hello(self):
+    @staticmethod
+    def hello():
         """
         Greet and use %whoami magic to print info at startup
         """
         print_formatted_text(HTML("<skyblue><b>>> Pylima</b></skyblue>"))
-        self.evaluator.magic_eval("whoami")
 
     @staticmethod
     def bye():
